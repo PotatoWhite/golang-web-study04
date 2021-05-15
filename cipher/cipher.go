@@ -15,12 +15,12 @@ func createHash(key string) string {
 	return hex.EncodeToString(hasher.Sum(nil))
 }
 
+// Encrypt encrypt data using aes
 func Encrypt(data []byte, passphrase string) ([]byte, error) {
 	block, err := aes.NewCipher([]byte(createHash(passphrase)))
 	if err != nil {
 		return nil, err
 	}
-
 	gcm, err := cipher.NewGCM(block)
 	if err != nil {
 		return nil, err
@@ -44,11 +44,14 @@ func Decrypt(data []byte, passphrase string) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	nonceSize := gcm.NonceSize()
 	nonce, ciphertext := data[:nonceSize], data[nonceSize:]
+
 	plaintext, err := gcm.Open(nil, nonce, ciphertext, nil)
 	if err != nil {
 		return nil, err
 	}
+
 	return plaintext, nil
 }
